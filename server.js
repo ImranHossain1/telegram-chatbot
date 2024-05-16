@@ -1,22 +1,10 @@
 import { Telegraf } from "telegraf";
 import userModel from "./src/models/User.js";
 import eventModel from "./src/models/Event.js";
-import connectDb from "./src/config/db.js";
+import openai from "./src/config/openai.js";
 import { message } from "telegraf/filters";
-import OpenAI from "openai";
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
-const openai = new OpenAI({
-  apiKey: process.env["OPENAI_API_KEY"], // This is the default and can be omitted
-});
-
-try {
-  connectDb();
-  console.log("database connected successfully");
-} catch (err) {
-  console.log(err);
-  process.kill(process.pid, "SIGTERM");
-}
 
 bot.start(async (ctx) => {
   // console.log("ctx", ctx)
@@ -116,9 +104,6 @@ bot.command("generate", async (ctx) => {
   // send response
 });
 
-// bot.on(message("sticker"), (ctx) => {
-//   console.log("sticker", ctx.update.message);
-// });
 bot.on(message("text"), async (ctx) => {
   const from = ctx.update.message.from;
   const message = ctx.update.message.text;
@@ -135,7 +120,4 @@ bot.on(message("text"), async (ctx) => {
     await ctx.reply("Facing difficulties, please try again later..");
   }
 });
-
-bot.launch();
-process.once("SIGINT", () => bot.stop("SIGINT"));
-process.once("SIGTERM", () => bot.stop("SIGTERM"));
+export default bot;
